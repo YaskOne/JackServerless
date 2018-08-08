@@ -1,0 +1,25 @@
+package hello_world
+
+import (
+        "encoding/json"
+        "log"
+
+        "github.com/aws/aws-lambda-go/events"
+        "github.com/aws/aws-lambda-go/lambda"
+)
+
+type body struct {
+        Message string `json:"message"`
+}
+
+// Handler is the Lambda function handler
+func hello_world(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+        log.Println("Lambda request", request.RequestContext.RequestID)
+
+        b, _ := json.Marshal(body{Message: "hello world"})
+
+        return events.APIGatewayProxyResponse{
+                Body:       string(b),
+                StatusCode: 200,
+        }, nil
+}
