@@ -50,5 +50,5 @@ func CreateBusiness(ctx context.Context, request *events.APIGatewayProxyRequest)
 }
 
 func main() {
-	lambda.Start(GetBusinessById)
+	lambda.Start(CreateBusiness)
 }

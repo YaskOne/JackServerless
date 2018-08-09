@@ -35,6 +35,19 @@ Resources:
             Path: /
             Method: get
 
+  CreateBusiness:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./bin
+      Handler: create_business
+      Runtime: go1.x
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /business/create
+            Method: get
+
   GetBusinessById:
     Type: AWS::Serverless::Function
     Properties:
