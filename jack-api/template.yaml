@@ -8,7 +8,7 @@ Description: >
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
     Function:
-        Timeout: 3
+        Timeout: 10
 
 # Parameters: 
 #   userTableName: 
@@ -28,6 +28,7 @@ Resources:
       CodeUri: ./bin
       Handler: main
       Runtime: go1.x
+      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
       Events:
         GetEvent:
           Type: Api
@@ -35,103 +36,275 @@ Resources:
             Path: /
             Method: get
 
+  # Business
   CreateBusiness:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ./bin
-      Handler: create_business
+      Handler: createBusiness
       Runtime: go1.x
+      Timeout: 10
+      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
+#        - arn:aws:iam::318620884208:role/LambdaVPCAccess
       Events:
         GetEvent:
           Type: Api
           Properties:
             Path: /business/create
-            Method: get
-
+            Method: post
   GetBusinessById:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ./bin
-      Handler: get_business_by_id
+      Handler: getBusinessById
       Runtime: go1.x
+      Timeout: 10
+      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
       Events:
         GetEvent:
           Type: Api
           Properties:
             Path: /business
             Method: get
-  DDBTable:
-    Type: AWS::DynamoDB::Table
+  GetProductsById:
+    Type: AWS::Serverless::Function
     Properties:
-      AttributeDefinitions:
-        -
-          AttributeName: "id"
-          AttributeType: "S"
-      KeySchema:
-        -
-          AttributeName: "id"
-          KeyType: "HASH"
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
-  WriteCapacityScalableTarget:
-    Type: AWS::ApplicationAutoScaling::ScalableTarget
+      CodeUri: ./bin
+      Handler: getProductsById
+      Runtime: go1.x
+      Timeout: 10
+      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /product
+            Method: get
+  GetBusinessInArea:
+    Type: AWS::Serverless::Function
     Properties:
-      MaxCapacity: 15
-      MinCapacity: 5
-      RoleARN: !GetAtt ScalingRole.Arn
-      ResourceId: !Join
-        - /
-        - - table
-          - !Ref DDBTable
-      ScalableDimension: dynamodb:table:WriteCapacityUnits
-      ServiceNamespace: dynamodb
-  ScalingRole:
-    Type: AWS::IAM::Role
+      CodeUri: ./bin
+      Handler: getBusinessInArea
+      Runtime: go1.x
+      Timeout: 10
+      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /business/area
+            Method: get
+  GetBusinessOrders:
+    Type: AWS::Serverless::Function
     Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          -
-            Effect: "Allow"
-            Principal:
-              Service:
-                - application-autoscaling.amazonaws.com
-            Action:
-              - "sts:AssumeRole"
-      Path: "/"
-      Policies:
-        -
-          PolicyName: "root"
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              -
-                Effect: "Allow"
-                Action:
-                  - "dynamodb:DescribeTable"
-                  - "dynamodb:UpdateTable"
-                  - "cloudwatch:PutMetricAlarm"
-                  - "cloudwatch:DescribeAlarms"
-                  - "cloudwatch:GetMetricStatistics"
-                  - "cloudwatch:SetAlarmState"
-                  - "cloudwatch:DeleteAlarms"
-                Resource: "*"
-  # TableName:
-  #   Name: 
-  #     - JackDB
-  WriteScalingPolicy:
-    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+      CodeUri: ./bin
+      Handler: getBusinessOrders
+      Runtime: go1.x
+      Timeout: 10
+      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /business/orders
+            Method: get
+  GetBusinessStocks:
+    Type: AWS::Serverless::Function
     Properties:
-      PolicyName: WriteAutoScalingPolicy
-      PolicyType: TargetTrackingScaling
-      ScalingTargetId: !Ref WriteCapacityScalableTarget
-      TargetTrackingScalingPolicyConfiguration:
-        TargetValue: 50.0
-        ScaleInCooldown: 60
-        ScaleOutCooldown: 60
-        PredefinedMetricSpecification:
-          PredefinedMetricType: DynamoDBWriteCapacityUtilization
+      CodeUri: ./bin
+      Handler: getBusinessStocks
+      Runtime: go1.x
+      Timeout: 10
+      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /business/stocks
+            Method: get
+
+  # Order
+  CreateOrder:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./bin
+      Handler: createOrder
+      Runtime: go1.x
+      Timeout: 10
+      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /business/order/create
+            Method: post
+
+  # Stock
+  CreateProduct:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./bin
+      Handler: createProduct
+      Runtime: go1.x
+      Timeout: 10
+      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /business/product/create
+            Method: post
+  CreateCategory:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./bin
+      Handler: createCategory
+      Runtime: go1.x
+      Timeout: 10
+      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /business/category/create
+            Method: post
+
+  ResetDB:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./bin
+      Handler: resetDB
+      Runtime: go1.x
+      Timeout: 10
+      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /utils/reset
+            Method: get
+#  JackDB:
+#    Type: AWS::DynamoDB::Table
+#    Properties:
+#      AttributeDefinitions:
+#        -
+#          AttributeName: "id"
+#          AttributeType: "S"
+#      KeySchema:
+#        -
+#          AttributeName: "id"
+#          KeyType: "HASH"
+#      ProvisionedThroughput:
+#        ReadCapacityUnits: 5
+#        WriteCapacityUnits: 5
+#      TableName: "JackDB"
+
+
+
+#  BusinessTable:
+#    Type: AWS::DynamoDB::Table
+#    Properties:
+#      TableName: "BusinessTabler"
+#      KeySchema:
+#        -
+#          AttributeName: "UUID"
+#          KeyType: "HASH"
+#      AttributeDefinitions:
+#        -
+#          AttributeName: "UUID"
+#          AttributeType: "S"
+#        -
+#          AttributeName: "name"
+#          AttributeType: "S"
+#        -
+#          AttributeName: "address"
+#          AttributeType: "S"
+##        -
+##          AttributeName: "name"
+##          KeyType: "RANGE"
+#      GlobalSecondaryIndexes:
+#        -
+#          IndexName: "BusinessIndex"
+#          KeySchema:
+#            -
+#              AttributeName: "name"
+#              KeyType: "RANGE"
+#            -
+#              AttributeName: "address"
+#              KeyType: "RANGE"
+#          Projection:
+#            ProjectionType: "ALL"
+#          ProvisionedThroughput:
+#            ReadCapacityUnits: 5
+#            WriteCapacityUnits: 5
+#      ProvisionedThroughput:
+#        ReadCapacityUnits: 5
+#        WriteCapacityUnits: 5
+#  WriteCapacityScalableTarget:
+#    Type: AWS::ApplicationAutoScaling::ScalableTarget
+#    Properties:
+#      MaxCapacity: 15
+#      MinCapacity: 5
+#      RoleARN: !GetAtt ScalingRole.Arn
+#      ResourceId: !Join
+#        - /
+#        - - table
+##          - !Ref JackDB
+#          - !Ref BusinessTable
+#      ScalableDimension: dynamodb:table:WriteCapacityUnits
+#      ServiceNamespace: dynamodb
+#  ScalingRole:
+#    Type: AWS::IAM::Role
+#    Properties:
+#      AssumeRolePolicyDocument:
+#        Version: "2012-10-17"
+#        Statement:
+#          -
+#            Effect: "Allow"
+#            Principal:
+#              Service:
+#                - application-autoscaling.amazonaws.com
+#            Action:
+#              - "sts:AssumeRole"
+#      Path: "/"
+#      Policies:
+#        -
+#          PolicyName: "root"
+#          PolicyDocument:
+#            Version: "2012-10-17"
+#            Statement:
+#              -
+#                Effect: "Allow"
+#                Action: "*"
+#                Resource: "*"
+
+
+#  PostgresCluster:
+#      DependsOn: PostgresSecurityGroup
+#      Type: AWS::RDS::DBInstance
+#      Properties:
+#          Engine: MySQL
+#          DBName: "Jacking"
+#          MasterUsername: "Arthur"
+#          MasterUserPassword: ""
+#          DBInstanceClass: !Ref DBType
+#          AllocatedStorage: !Ref DBCapacity
+#          DBSubnetGroupName: !Ref PostgresSubnetGroup
+#          VPCSecurityGroups:
+#              - !GetAtt PostgresSecurityGroup.GroupId
+
+#  WriteScalingPolicy:
+#    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+#    Properties:
+#      PolicyName: WriteAutoScalingPolicy
+#      PolicyType: TargetTrackingScaling
+#      ScalingTargetId: !Ref WriteCapacityScalableTarget
+#      TargetTrackingScalingPolicyConfiguration:
+#        TargetValue: 50.0
+#        ScaleInCooldown: 60
+#        ScaleOutCooldown: 60
+#        PredefinedMetricSpecification:
+#          PredefinedMetricType: DynamoDBWriteCapacityUtilization
 
 Outputs:
 

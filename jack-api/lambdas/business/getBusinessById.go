@@ -1,58 +1,32 @@
-package business
+package main
 
 import (
-        "log"
-
-        "github.com/aws/aws-lambda-go/events"
-        "github.com/aws/aws-lambda-go/lambda"
-        "context"
-        "github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
-        "github.com/aws/aws-sdk-go/service/dynamodb"
-        "github.com/aws/aws-sdk-go/aws"
-        "fmt"
-        "JackServerless/jack-api/models"
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
+	"context"
+	"JackServerless/jack-api/core"
+	"JackServerless/jack-api/db"
+	"JackServerless/jack-api/utils"
 )
 
-// Handler is the Lambda function handler
-func GetBusinessById(ctx context.Context, request *events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-        log.Println("Lambda request", request.RequestContext.RequestID)
 
-        result, err := models.DB().GetItem(&dynamodb.GetItemInput{
-                TableName: aws.String("Business"),
-                Key: map[string]*dynamodb.AttributeValue{
-                        "id": {
-                                N: aws.String("0"),
-                        },
-                },
-        })
+func GetBusinessById(ctx context.Context, request *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+	businesses := []db.Business {}
 
-        if err != nil {
-                fmt.Println(err.Error())
-        }
+	ids := request.QueryStringParameters["ids"]
 
-        item := models.Business{}
+	if len(ids) == 0 {
+		db.DB().Find(&businesses)
+	} else {
+		db.DB().
+			Where(utils.SplitArrayString(ids)).
+			Find(&businesses)
+	}
 
-        err = dynamodbattribute.UnmarshalMap(result.Item, &item)
-
-        if err != nil {
-                panic(fmt.Sprintf("Failed to unmarshal Record, %v", err))
-        }
-
-        fmt.Println("Found item:")
-        fmt.Println("Year:  ", result)
-        fmt.Println("Year:  ", result.Item)
-        fmt.Println("Year:  ", item.Name)
-        fmt.Println("Title: ", item.Latitude)
-        fmt.Println("Plot:  ", item.Address)
-        fmt.Println("Rating:", item.Type)
-
-
-        return events.APIGatewayProxyResponse{
-                Body:       string("GetBusiness"),
-                StatusCode: 200,
-        }, nil
+	return core.MakeHTTPResponse(200, db.BusinessResponse{businesses})
 }
 
+
 func main() {
-        lambda.Start(GetBusinessById)
+	lambda.Start(GetBusinessById)
 }
