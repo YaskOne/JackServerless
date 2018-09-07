@@ -3,65 +3,66 @@ package main
 import (
 	"github.com/aws/aws-lambda-go/events"
 	"JackServerless/jack-api/db"
-	"encoding/json"
 	"JackServerless/jack-api/core"
 	"net/http"
 	"time"
 	"context"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/kr/pretty"
+	"encoding/json"
 )
 
 /*
 	 Create new order route
 */
 
-func CreateOrder(ctx context.Context, request *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
-	println("1111")
+func createOrder(ctx context.Context, request *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	var order db.Order
 	var params db.OrderRequest
 
-	println("1111")
 	if err := json.Unmarshal([]byte(request.Body), &params); err != nil {
 		return core.MakeHTTPError(http.StatusNotAcceptable, err.Error())
 	}
 
-	println("2222")
-	pretty.Println(params)
 	retrieveDate, _ := time.Parse(time.RFC3339, params.RetrieveDate)
 
-	//order.Products = products
 	order.BusinessID = params.BusinessID
 	order.UserID = params.UserID
 	order.RetrieveDate = retrieveDate
-	println("3333")
+	order.Canceled = false
+	order.Status = db.OrderStatus("PENDING")
+	order.State = db.OrderState("WAITING")
+
 	pretty.Println(order)
 
 	// creates place
-	if !db.CreateOrder(&order) {
+	if valid, err := order.Valid(); !valid {
+		return core.MakeHTTPError(400, err)
+	}
+
+	if !(&order).Create() {
 		return core.MakeHTTPError(http.StatusInternalServerError, "Error: creating order")
 	}
-	println("4444")
 
-	pretty.Println(params)
+	products := db.GetProductsById(params.ProductIds)
 
+	price := 0.0
 	i := 0
-	for i < len(params.ProductIds) {
+	for i < len(products) {
 		orderProduct := db.OrderProduct{}
-		//orderProduct.Model = db.Model{}
 		orderProduct.OrderID = order.ID
 		orderProduct.ProductID = params.ProductIds[i]
 		db.DB().Create(&orderProduct)
-		println("---------------")
+		price += products[i].Price
 		i += 1
 	}
 
-	println(order.BusinessID)
+	order.Price = price
+	db.DB().Save(&order)
 
-	//"orders_id": ordersResponse,
-	return core.MakeHTTPResponse(http.StatusOK, order)
+	return core.MakeHTTPResponse(http.StatusOK, db.IdModel{order.ID})
 }
 
 func main() {
-	lambda.Start(CreateOrder)
+	lambda.Start(createOrder)
 }

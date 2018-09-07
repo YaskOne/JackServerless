@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/aws/aws-lambda-go/events"
 	"JackServerless/jack-api/db"
-	"encoding/json"
 	"JackServerless/jack-api/core"
 	"net/http"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -14,25 +13,26 @@ import (
 	 Create new category
 */
 
-func CreateCategory(ctx context.Context, request *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
-	var params db.Category
+func createCategory(ctx context.Context, request *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+	category := db.Category{}
 
-	if err := json.Unmarshal([]byte(request.Body), &params); err != nil {
-		return core.MakeHTTPError(http.StatusNotAcceptable, err.Error())
+	if !(&category).Parse(request.Body) {
+		return core.MakeHTTPError(400, "Error in input parameters")
 	}
 
-	var business db.Business
-	if db.DB().Where(params.BusinessID).Find(&business).RecordNotFound() {
-		return core.MakeHTTPError(http.StatusNotAcceptable, "Business not found")
+	if valid, err := category.Valid(); !valid {
+		return core.MakeHTTPError(400, err)
 	}
 
-	db.CreateCategory(&params)
+	if !(&category).Create() {
+		return core.MakeHTTPError(400, "Error creating catgeory")
+	}
 
-	return core.MakeHTTPResponse(http.StatusOK, db.IDResponse{params.ID})
+	return core.MakeHTTPResponse(http.StatusOK, db.IdModel{category.ID})
 }
 
 func main() {
-	lambda.Start(CreateCategory)
+	lambda.Start(createCategory)
 }
 
 /*

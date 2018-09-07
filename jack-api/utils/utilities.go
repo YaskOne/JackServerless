@@ -8,6 +8,7 @@ import (
 func SplitArrayString(stringIds string) (res []uint) {
 	stringIds = strings.Replace(stringIds, "[", "", -1)
 	stringIds = strings.Replace(stringIds, "]", "", -1)
+	stringIds = strings.Replace(stringIds, " ", "", -1)
 
 	stringArray := strings.Split(stringIds, ",")
 

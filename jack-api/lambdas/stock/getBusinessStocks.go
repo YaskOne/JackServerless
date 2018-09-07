@@ -11,16 +11,16 @@ import (
 	"github.com/kr/pretty"
 )
 
-type Section struct {
+type section struct {
 	db.Category
 	Products []db.Product `json:"products"`
 }
 
-type BusinessProductsResponse struct {
+type businessProductsResponse struct {
 	Stocks interface{} `json:"stocks"`
 }
 
-func GetBusinessStocks(ctx context.Context, request *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+func getBusinessStocks(ctx context.Context, request *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	println("YAYAYAYAYYAYAYAYAYAYA_____")
 	id, err := strconv.ParseUint(request.QueryStringParameters["id"], 10,64)
 
@@ -28,12 +28,7 @@ func GetBusinessStocks(ctx context.Context, request *events.APIGatewayProxyReque
 		return core.MakeHTTPError(http.StatusNotAcceptable, err.Error())
 	}
 
-	sections := []Section{}
-
-	//business := db.GetBusiness(request.BusinessID)
-	//if db.BusinessExists(business) == nil {
-	//
-	//}
+	sections := []section{}
 	categories := []db.Category{}
 	//categories := db.GetBusinessCategories(db.Business{db.Model{ID: 1}}).Related(&categories)
 	db.DB().Where("business_id = ?", id).Find(&categories)
@@ -44,7 +39,7 @@ func GetBusinessStocks(ctx context.Context, request *events.APIGatewayProxyReque
 		products := []db.Product {}
 		db.DB().Where("category_id = ?", categories[i].ID).Find(&products)
 
-		section := Section{}
+		section := section{}
 		section.Category = categories[i]
 		section.Products = products
 
@@ -53,9 +48,9 @@ func GetBusinessStocks(ctx context.Context, request *events.APIGatewayProxyReque
 	}
 	pretty.Println(sections)
 
-	return core.MakeHTTPResponse(http.StatusOK, BusinessProductsResponse{sections})
+	return core.MakeHTTPResponse(http.StatusOK, businessProductsResponse{sections})
 }
 
 func main() {
-	lambda.Start(GetBusinessStocks)
+	lambda.Start(getBusinessStocks)
 }

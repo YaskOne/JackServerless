@@ -13,14 +13,14 @@ import (
 	 Fetch businesses in area
 */
 
-type FetchBusinessInAreaRequest struct {
+type fetchBusinessInAreaRequest struct {
 	NearLeftLatitude float64 `json:"near_left_latitude"`
 	NearLeftLongitude float64 `json:"near_left_longitude"`
 	FarRightLatitude float64 `json:"far_right_latitude"`
 	FarRightLongitude float64 `json:"far_right_longitude"`
 }
 
-func FetchBusinessInArea(ctx context.Context, request *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+func fetchBusinessInArea(ctx context.Context, request *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	businesses := []db.Business {}
 
 	nearLeftLat, nearLeftLatErr := strconv.ParseFloat(request.QueryStringParameters["near_left_latitude"], 64)
@@ -42,21 +42,9 @@ func FetchBusinessInArea(ctx context.Context, request *events.APIGatewayProxyReq
 			farRightLng,
 		).Find(&businesses)
 
-	return core.MakeHTTPResponse(200, db.BusinessResponse{businesses})
-	//return core.MakeHTTPError(200, businesses)
-
-	//var i interface{}
-	//i = businesses
-	//
-	//body, _ := json.Marshal(core.HTTPErrorBody{i})
-	//
-	//return &events.APIGatewayProxyResponse{
-	//	StatusCode: 200,
-	//	Body:       string(body),
-	//	Headers:    map[string]string{core.ContentType: core.JSON},
-	//}, nil
+	return core.MakeHTTPResponse(200, db.BusinessesResponse{businesses})
 }
 
 func main() {
-	lambda.Start(FetchBusinessInArea)
+	lambda.Start(fetchBusinessInArea)
 }

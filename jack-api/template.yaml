@@ -8,7 +8,7 @@ Description: >
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
     Function:
-        Timeout: 10
+        Timeout: 15
 
 # Parameters: 
 #   userTableName: 
@@ -20,45 +20,73 @@ Globals:
 #   Default: "user-city-index"
 #   Description: "Name of the user index"
 
+Parameters:
+    APIVersion:
+        Type: String
+        Default: v1
+
+    APIStage:
+        Type: String
+        Default: dev
+
+    DBName :
+        Type : String
+        Default: indigovaultDB
+
+    DBType:
+        Type: String
+        Default: db.t2.micro
+
+    DBCapacity:
+        Type: Number
+        Default: 10
+
+    S3BucketName:
+        Type: String
+        Default: indigovault-documents.stratumn.com
+
 Resources:
 
-  HelloWorldFunction:
+  JackAuthorizer:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./bin
-      Handler: main
+      Handler: jackAuthorizer
+      CodeUri: bin
       Runtime: go1.x
-      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
-      Events:
-        GetEvent:
-          Type: Api
-          Properties:
-            Path: /
-            Method: get
 
   # Business
-  CreateBusiness:
+  createBusiness:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ./bin
       Handler: createBusiness
       Runtime: go1.x
-      Timeout: 10
       Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
-#        - arn:aws:iam::318620884208:role/LambdaVPCAccess
       Events:
         GetEvent:
           Type: Api
           Properties:
             Path: /business/create
             Method: post
-  GetBusinessById:
+  deleteBusiness:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./bin
+      Handler: deleteBusiness
+      Runtime: go1.x
+      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /business/delete
+            Method: post
+  getBusinessById:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ./bin
       Handler: getBusinessById
       Runtime: go1.x
-      Timeout: 10
       Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
       Events:
         GetEvent:
@@ -66,13 +94,12 @@ Resources:
           Properties:
             Path: /business
             Method: get
-  GetProductsById:
+  getProducts:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ./bin
-      Handler: getProductsById
+      Handler: getProducts
       Runtime: go1.x
-      Timeout: 10
       Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
       Events:
         GetEvent:
@@ -80,13 +107,90 @@ Resources:
           Properties:
             Path: /product
             Method: get
+  getCategories:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./bin
+      Handler: getCategories
+      Runtime: go1.x
+      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /category
+            Method: get
+  updateCategory:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./bin
+      Handler: updateCategory
+      Runtime: go1.x
+      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /category/update
+            Method: post
+  updateBusiness:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./bin
+      Handler: updateBusiness
+      Runtime: go1.x
+      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /business/update
+            Method: post
+  updateUser:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./bin
+      Handler: updateUser
+      Runtime: go1.x
+      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /user/update
+            Method: post
+  updateProduct:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./bin
+      Handler: updateProduct
+      Runtime: go1.x
+      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /product/update
+            Method: post
+  LogBusiness:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./bin
+      Handler: logBusiness
+      Runtime: go1.x
+      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /business/log
+            Method: get
   GetBusinessInArea:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ./bin
       Handler: getBusinessInArea
       Runtime: go1.x
-      Timeout: 10
       Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
       Events:
         GetEvent:
@@ -94,27 +198,38 @@ Resources:
           Properties:
             Path: /business/area
             Method: get
-  GetBusinessOrders:
+  getOrders:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ./bin
-      Handler: getBusinessOrders
+      Handler: getOrders
       Runtime: go1.x
-      Timeout: 10
       Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
       Events:
         GetEvent:
           Type: Api
           Properties:
-            Path: /business/orders
+            Path: /order
             Method: get
+  updateOrder:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./bin
+      Handler: updateOrder
+      Runtime: go1.x
+      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /order/update
+            Method: post
   GetBusinessStocks:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ./bin
       Handler: getBusinessStocks
       Runtime: go1.x
-      Timeout: 10
       Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
       Events:
         GetEvent:
@@ -130,7 +245,6 @@ Resources:
       CodeUri: ./bin
       Handler: createOrder
       Runtime: go1.x
-      Timeout: 10
       Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
       Events:
         GetEvent:
@@ -146,7 +260,6 @@ Resources:
       CodeUri: ./bin
       Handler: createProduct
       Runtime: go1.x
-      Timeout: 10
       Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
       Events:
         GetEvent:
@@ -160,7 +273,6 @@ Resources:
       CodeUri: ./bin
       Handler: createCategory
       Runtime: go1.x
-      Timeout: 10
       Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
       Events:
         GetEvent:
@@ -169,13 +281,66 @@ Resources:
             Path: /business/category/create
             Method: post
 
+  # User
+  LogUser:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./bin
+      Handler: logUser
+      Runtime: go1.x
+      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /user/log
+            Method: get
+  GetUsers:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./bin
+      Handler: getUsers
+      Runtime: go1.x
+      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /user
+            Method: get
+  CreateUser:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./bin
+      Handler: createUser
+      Runtime: go1.x
+      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /user/create
+            Method: post
+  deleteUser:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./bin
+      Handler: deleteUser
+      Runtime: go1.x
+      Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /user/delete
+            Method: post
+
   ResetDB:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ./bin
       Handler: resetDB
       Runtime: go1.x
-      Timeout: 10
       Role: arn:aws:iam::318620884208:role/LambdaVPCAccess
       Events:
         GetEvent:
@@ -183,63 +348,6 @@ Resources:
           Properties:
             Path: /utils/reset
             Method: get
-#  JackDB:
-#    Type: AWS::DynamoDB::Table
-#    Properties:
-#      AttributeDefinitions:
-#        -
-#          AttributeName: "id"
-#          AttributeType: "S"
-#      KeySchema:
-#        -
-#          AttributeName: "id"
-#          KeyType: "HASH"
-#      ProvisionedThroughput:
-#        ReadCapacityUnits: 5
-#        WriteCapacityUnits: 5
-#      TableName: "JackDB"
-
-
-
-#  BusinessTable:
-#    Type: AWS::DynamoDB::Table
-#    Properties:
-#      TableName: "BusinessTabler"
-#      KeySchema:
-#        -
-#          AttributeName: "UUID"
-#          KeyType: "HASH"
-#      AttributeDefinitions:
-#        -
-#          AttributeName: "UUID"
-#          AttributeType: "S"
-#        -
-#          AttributeName: "name"
-#          AttributeType: "S"
-#        -
-#          AttributeName: "address"
-#          AttributeType: "S"
-##        -
-##          AttributeName: "name"
-##          KeyType: "RANGE"
-#      GlobalSecondaryIndexes:
-#        -
-#          IndexName: "BusinessIndex"
-#          KeySchema:
-#            -
-#              AttributeName: "name"
-#              KeyType: "RANGE"
-#            -
-#              AttributeName: "address"
-#              KeyType: "RANGE"
-#          Projection:
-#            ProjectionType: "ALL"
-#          ProvisionedThroughput:
-#            ReadCapacityUnits: 5
-#            WriteCapacityUnits: 5
-#      ProvisionedThroughput:
-#        ReadCapacityUnits: 5
-#        WriteCapacityUnits: 5
 #  WriteCapacityScalableTarget:
 #    Type: AWS::ApplicationAutoScaling::ScalableTarget
 #    Properties:

@@ -1,63 +1,81 @@
 package db
 
+import "encoding/json"
+
 /*
 	DB models
 */
-
-type Category struct {
-	ID        uint `json:"id" gorm:"primary_key"`
-
-	Name string `binding:"required" json:"name" gorm:"not null"`
-	BusinessID uint `json:"business_id" gorm:"not null" binding:"required"`
-}
 
 type Product struct {
 	ID        uint `json:"id" gorm:"primary_key"`
 
 	Name string `form:"name" json:"name" gorm:"not null" binding:"required"`
-	Price float32 `form:"price" json:"price" gorm:"not null" binding:"required"`
+	Price float64 `form:"price" json:"price" gorm:"not null" binding:"required"`
 	Url string `form:"url" json:"url" gorm:"not null"`
 
 	CategoryID uint `form:"category_id" json:"category_id" gorm:"not null" binding:"required"`
 	BusinessID uint `form:"business_id" json:"business_id" gorm:"not null" binding:"required"`
 }
 
-type ProductResponse struct {
+type ProductsResponse struct {
 	Products interface{} `json:"products"`
 }
-
-/*
-	Model mofiers
-*/
-
-func CreateProduct(request *Product) (success bool) {
-	// request.BusinessID = request.BusinessID
-
-	return DB().Create(request).Error == nil
-}
-
-func CreateCategory(request *Category) (success bool) {
-	// request.BusinessID = request.BusinessID
-
-	return DB().Create(request).Error == nil
+type ProductResponse struct {
+	Product interface{} `json:"product"`
 }
 
 /*
 	Accessors
 */
 
-func GetCategoryProducts(category Category) ([]Product) {
+func GetProductsById(ids []uint) ([]Product) {
 	products := []Product{}
 
-	DB().Model(category).Find(&products)
+	var i = 0
+	for i < len(ids) {
+		product := Product{}
+		DB().Where(ids[i]).First(&product)
+		products = append(products, product)
+		i += 1
+	}
 
 	return products
 }
 
-func GetBusinessCategories(business Business) ([]Category) {
-	categories := []Category{}
+func (model *Product) Parse(data string) bool {
+	if err := json.Unmarshal([]byte(data), model); err != nil {
+		return false
+	}
+	return true
+}
 
-	DB().Model(business).Find(&categories)
+func (model Product) Exists() bool {
+	if model.ID == 0 {
+		return DB().Where(&Product{Name: model.Name, BusinessID: model.BusinessID}).First(&model).Error == nil
+	}
+	return DB().Where(model.ID).Find(&model).Error == nil
+}
 
-	return categories
+func (model *Product) Load() bool {
+	if model.ID == 0 {
+		return false
+	}
+	return DB().Where(model.ID).First(&model).Error == nil
+}
+
+func (model Product) Valid() (bool, string) {
+	if len(model.Name) < 1 {
+		return false, "name too short, must be at leat 1 characters"
+	} else if model.Exists() {
+		return false, "product already exists"
+	}
+	return true, ""
+}
+
+func (model *Product) Create() bool {
+	return DB().Create(model).Error == nil
+}
+
+func (model *Product) Delete() bool {
+	return DB().Delete(model).Error == nil
 }

@@ -1,25 +1,38 @@
 OUTPUT = bin
 LAMBDA_SUFFIX = .go
 
-MAIN_OUTPUT = main
-
 # Business
 GET_BUSINESS_BY_ID_OUTPUT = getBusinessById
 CREATE_BUSINESS = createBusiness
 GET_BUSINESS_IN_AREA = getBusinessInArea
+LOG_BUSINESS = logBusiness
+DELETE_BUSINESS = deleteBusiness
+UPDATE_BUSINESS = updateBusiness
 
 # Stocks
 CREATE_PRODUCT = createProduct
 CREATE_CATEGORY = createCategory
 GET_BUSINESS_STOCKS = getBusinessStocks
-GET_PRODUCTS_BY_ID = getProductsById
+GET_PRODUCTS = getProducts
+GET_CATEGORIES = getCategories
+UPDATE_CATEGORY = updateCategory
+UPDATE_PRODUCT = updateProduct
 
 # Order
 CREATE_ORDER = createOrder
-GET_BUSINESS_ORDERS = getBusinessOrders
+GET_ORDERS = getOrders
+UPDATE_ORDER = updateOrder
+
+# User
+LOG_USER = logUser
+CREATE_USER = createUser
+GET_USERS = getUsers
+DELETE_USER = deleteUser
+UPDATE_USER = updateUser
 
 # Utilities
 RESET_DB = resetDB
+JACK_AUTHORIZER = jackAuthorizer
 
 PACKAGED_TEMPLATE = packaged.yaml
 S3_BUCKET := jack-world-app
@@ -32,28 +45,50 @@ test:
 
 .PHONY: clean
 clean:
-	rm -f $(MAIN_OUTPUT) $(GET_BUSINESS_BY_ID_OUTPUT) $(CREATE_BUSINESS) $(GET_BUSINESS_IN_AREA) $(RESET_DB) $(PACKAGED_TEMPLATE)
+	rm -f $(OUTPUT)/$(GET_BUSINESS_BY_ID_OUTPUT)
+	rm -f $(OUTPUT)/$(CREATE_BUSINESS)
+	rm -f $(OUTPUT)/$(GET_BUSINESS_IN_AREA)
+	rm -f $(OUTPUT)/$(CREATE_PRODUCT)
+	rm -f $(OUTPUT)/$(CREATE_CATEGORY)
+	rm -f $(OUTPUT)/$(GET_BUSINESS_STOCKS)
+	rm -f $(OUTPUT)/$(GET_PRODUCTS)
+	rm -f $(OUTPUT)/$(GET_CATEGORIES)
+	rm -f $(OUTPUT)/$(CREATE_ORDER)
+	rm -f $(OUTPUT)/$(GET_BUSINESS_ORDERS)
+	rm -f $(OUTPUT)/$(RESET_DB)
 
 .PHONY: install
 install:
 	go get ./...
 
 main:
-	go build -o $(OUTPUT)/$(MAIN_OUTPUT) ./$(MAIN_OUTPUT).go
-
 	go build -o $(OUTPUT)/$(GET_BUSINESS_BY_ID_OUTPUT) ./lambdas/business/$(GET_BUSINESS_BY_ID_OUTPUT).go
 	go build -o $(OUTPUT)/$(CREATE_BUSINESS) ./lambdas/business/$(CREATE_BUSINESS).go
 	go build -o $(OUTPUT)/$(GET_BUSINESS_IN_AREA) ./lambdas/business/$(GET_BUSINESS_IN_AREA).go
+	go build -o $(OUTPUT)/$(LOG_BUSINESS) ./lambdas/business/$(LOG_BUSINESS).go
+	go build -o $(OUTPUT)/$(DELETE_BUSINESS) ./lambdas/business/$(DELETE_BUSINESS).go
+	go build -o $(OUTPUT)/$(UPDATE_BUSINESS) ./lambdas/business/$(UPDATE_BUSINESS).go
 
 	go build -o $(OUTPUT)/$(CREATE_PRODUCT) ./lambdas/stock/$(CREATE_PRODUCT).go
 	go build -o $(OUTPUT)/$(CREATE_CATEGORY) ./lambdas/stock/$(CREATE_CATEGORY).go
 	go build -o $(OUTPUT)/$(GET_BUSINESS_STOCKS) ./lambdas/stock/$(GET_BUSINESS_STOCKS).go
-	go build -o $(OUTPUT)/$(GET_PRODUCTS_BY_ID) ./lambdas/stock/$(GET_PRODUCTS_BY_ID).go
+	go build -o $(OUTPUT)/$(GET_PRODUCTS) ./lambdas/stock/$(GET_PRODUCTS).go
+	go build -o $(OUTPUT)/$(GET_CATEGORIES) ./lambdas/stock/$(GET_CATEGORIES).go
+	go build -o $(OUTPUT)/$(UPDATE_CATEGORY) ./lambdas/stock/$(UPDATE_CATEGORY).go
+	go build -o $(OUTPUT)/$(UPDATE_PRODUCT) ./lambdas/stock/$(UPDATE_PRODUCT).go
+
+	go build -o $(OUTPUT)/$(LOG_USER) ./lambdas/user/$(LOG_USER).go
+	go build -o $(OUTPUT)/$(CREATE_USER) ./lambdas/user/$(CREATE_USER).go
+	go build -o $(OUTPUT)/$(GET_USERS) ./lambdas/user/$(GET_USERS).go
+	go build -o $(OUTPUT)/$(DELETE_USER) ./lambdas/user/$(DELETE_USER).go
+	go build -o $(OUTPUT)/$(UPDATE_USER) ./lambdas/user/$(UPDATE_USER).go
 
 	go build -o $(OUTPUT)/$(CREATE_ORDER) ./lambdas/order/$(CREATE_ORDER).go
-	go build -o $(OUTPUT)/$(GET_BUSINESS_ORDERS) ./lambdas/order/$(GET_BUSINESS_ORDERS).go
+	go build -o $(OUTPUT)/$(GET_ORDERS) ./lambdas/order/$(GET_ORDERS).go
+	go build -o $(OUTPUT)/$(UPDATE_ORDER) ./lambdas/order/$(UPDATE_ORDER).go
 
 	go build -o $(OUTPUT)/$(RESET_DB) ./lambdas/utils/$(RESET_DB).go
+	go build -o $(OUTPUT)/$(JACK_AUTHORIZER) ./lambdas/auth/$(JACK_AUTHORIZER).go
 
 # compile the code to run in Lambda (local or real)
 .PHONY: lambda
@@ -61,7 +96,7 @@ lambda:
 	GOOS=linux GOARCH=amd64 $(MAKE) main
 
 .PHONY: build
-build: clean lambda
+build: lambda
 
 .PHONY: api
 api: build

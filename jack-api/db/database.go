@@ -5,7 +5,6 @@ import (
 	"os"
 	"github.com/jinzhu/gorm"
 	_ "github.com/go-sql-driver/mysql"
-	"time"
 )
 
 // table names constants
@@ -15,14 +14,24 @@ const (
 	OrderTable = "OrderTable"
 )
 
-type Model struct {
-	ID        uint `json:"id" gorm:"primary_key"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	DeletedAt *time.Time `json:"deleted_at"`
+type ModelHandler interface {
+	Exists() bool
+	Create() bool
+	Load() bool
+	Delete() bool
+	Valid() (bool, string)
 }
 
-type IDResponse struct {
+type Model struct {
+	ID        uint `json:"id" gorm:"primary_key"`
+	//CreatedAt time.Time `json:"created_at"`
+	//UpdatedAt time.Time `json:"updated_at"`
+	//DeletedAt *time.Time `json:"deleted_at"`
+
+	ModelHandler `gorm:"-"`
+}
+
+type IdModel struct {
 	ID uint `json:"id"`
 }
 
@@ -61,4 +70,5 @@ func initializeDB() {
 	database.AutoMigrate(&Order{})
 	database.AutoMigrate(&OrderProduct{})
 	database.AutoMigrate(&Business{})
+	database.AutoMigrate(&User{})
 }

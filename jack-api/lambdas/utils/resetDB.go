@@ -11,13 +11,22 @@ import (
 // Handler is the Lambda function handler
 func ResetDB(ctx context.Context, request *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 
-	////
-	db.DB().DropTableIfExists(&db.Business{})
-	db.DB().DropTableIfExists(&db.Category{})
-	db.DB().DropTableIfExists(&db.LatLng{})
-	db.DB().DropTableIfExists(&db.Product{})
-	db.DB().DropTableIfExists(&db.Order{})
-	db.DB().DropTableIfExists(&db.OrderProduct{})
+	if request.QueryStringParameters["business"] == "true" {
+		db.DB().DropTableIfExists(&db.Business{})
+	}
+	if request.QueryStringParameters["category"] == "true" {
+		db.DB().DropTableIfExists(&db.Category{})
+	}
+	if request.QueryStringParameters["product"] == "true" {
+		db.DB().DropTableIfExists(&db.Product{})
+	}
+	if request.QueryStringParameters["order"] == "true" {
+		db.DB().DropTableIfExists(&db.Order{})
+		db.DB().DropTableIfExists(&db.OrderProduct{})
+	}
+	if request.QueryStringParameters["user"] == "true" {
+		db.DB().DropTableIfExists(&db.User{})
+	}
 
 	db.DB().AutoMigrate(&db.Business{})
 	db.DB().AutoMigrate(&db.Category{})
@@ -25,6 +34,7 @@ func ResetDB(ctx context.Context, request *events.APIGatewayProxyRequest) (*even
 	db.DB().AutoMigrate(&db.Product{})
 	db.DB().AutoMigrate(&db.Order{})
 	db.DB().AutoMigrate(&db.OrderProduct{})
+	db.DB().AutoMigrate(&db.User{})
 
 	return core.MakeHTTPResponse(200, "yeah")
 }

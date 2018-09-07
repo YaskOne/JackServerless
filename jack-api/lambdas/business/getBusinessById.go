@@ -10,7 +10,7 @@ import (
 )
 
 
-func GetBusinessById(ctx context.Context, request *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+func getBusinessById(ctx context.Context, request *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	businesses := []db.Business {}
 
 	ids := request.QueryStringParameters["ids"]
@@ -23,10 +23,10 @@ func GetBusinessById(ctx context.Context, request *events.APIGatewayProxyRequest
 			Find(&businesses)
 	}
 
-	return core.MakeHTTPResponse(200, db.BusinessResponse{businesses})
+	return core.MakeHTTPResponse(200, db.BusinessesResponse{businesses})
 }
 
 
 func main() {
-	lambda.Start(GetBusinessById)
+	lambda.Start(getBusinessById)
 }
