@@ -10,7 +10,7 @@ import (
 )
 
 func updateBusiness(ctx context.Context, request *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
-	params := db.Business{}
+	params := db.Business{DisponibilityStatus: -1}
 	business := db.Business{}
 
 	if !(&params).Parse(request.Body) {
@@ -43,6 +43,15 @@ func updateBusiness(ctx context.Context, request *events.APIGatewayProxyRequest)
 	}
 	if params.Password != "" {
 		business.Password = params.Password
+	}
+	if params.FcmToken != "" {
+		business.FcmToken = params.FcmToken
+	}
+	if params.DefaultPreparationDuration != 0 {
+		business.DefaultPreparationDuration = params.DefaultPreparationDuration
+	}
+	if params.DisponibilityStatus != -1 {
+		business.DefaultPreparationDuration = params.DefaultPreparationDuration
 	}
 
 	db.DB().Save(&business)

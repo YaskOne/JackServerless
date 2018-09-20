@@ -5,6 +5,7 @@ import (
 	"os"
 	"github.com/jinzhu/gorm"
 	_ "github.com/go-sql-driver/mysql"
+	"JackServerless/jack-api/core"
 )
 
 // table names constants
@@ -36,7 +37,6 @@ type IdModel struct {
 }
 
 var database *gorm.DB = nil
-//var database *dynamodb.DynamoDB = nil
 
 func DB() *gorm.DB {
 	if database == nil {
@@ -47,13 +47,7 @@ func DB() *gorm.DB {
 
 func initializeDB() {
 
-	user := "JackAdmin"
-	password := "ArgosBubble3"
-	_db := "JackDB"
-	//endpoint := "172.31.28.36:3308"
-	endpoint := "jackdbmysql.crqo2vw40anm.eu-west-2.rds.amazonaws.com:3308"
-
-	db, err := gorm.Open("mysql", user+":"+password+"@tcp("+endpoint+")/"+_db+"?parseTime=true")
+	db, err := gorm.Open("mysql", core.DbUser+":"+core.DbPassword+"@tcp("+core.Endpoint+")/"+core.DbName+"?parseTime=true")
 
 	if err != nil {
 		fmt.Println("ERROR: Failed opening aws session")
@@ -71,4 +65,5 @@ func initializeDB() {
 	database.AutoMigrate(&OrderProduct{})
 	database.AutoMigrate(&Business{})
 	database.AutoMigrate(&User{})
+	database.AutoMigrate(&Transaction{})
 }

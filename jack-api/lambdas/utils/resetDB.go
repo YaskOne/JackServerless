@@ -27,6 +27,9 @@ func ResetDB(ctx context.Context, request *events.APIGatewayProxyRequest) (*even
 	if request.QueryStringParameters["user"] == "true" {
 		db.DB().DropTableIfExists(&db.User{})
 	}
+	if request.QueryStringParameters["transaction"] == "true" {
+		db.DB().DropTableIfExists(&db.Transaction{})
+	}
 
 	db.DB().AutoMigrate(&db.Business{})
 	db.DB().AutoMigrate(&db.Category{})
@@ -35,6 +38,7 @@ func ResetDB(ctx context.Context, request *events.APIGatewayProxyRequest) (*even
 	db.DB().AutoMigrate(&db.Order{})
 	db.DB().AutoMigrate(&db.OrderProduct{})
 	db.DB().AutoMigrate(&db.User{})
+	db.DB().AutoMigrate(&db.Transaction{})
 
 	return core.MakeHTTPResponse(200, "yeah")
 }

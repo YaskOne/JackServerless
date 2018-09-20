@@ -1,10 +1,24 @@
 OUTPUT = bin
 LAMBDA_SUFFIX = .go
 
+PACKAGED_TEMPLATE = packaged.yaml
+S3_BUCKET := jack-world-app
+STACK_NAME := JackStage
+TEMPLATE = template.yaml
+
+#JackTakewayDev
+#JackTakewayProd
+#JackTakewayStage
+
+#JackBusinessDev
+#JackBusinessProd
+#JackBusinessStage
+
+
+
 # Business
 GET_BUSINESS_BY_ID_OUTPUT = getBusinessById
 CREATE_BUSINESS = createBusiness
-GET_BUSINESS_IN_AREA = getBusinessInArea
 LOG_BUSINESS = logBusiness
 DELETE_BUSINESS = deleteBusiness
 UPDATE_BUSINESS = updateBusiness
@@ -17,6 +31,8 @@ GET_PRODUCTS = getProducts
 GET_CATEGORIES = getCategories
 UPDATE_CATEGORY = updateCategory
 UPDATE_PRODUCT = updateProduct
+DELETE_ITEM = deleteItem
+ORDERS_WATCHER = ordersWatcher
 
 # Order
 CREATE_ORDER = createOrder
@@ -30,14 +46,12 @@ GET_USERS = getUsers
 DELETE_USER = deleteUser
 UPDATE_USER = updateUser
 
+# Payment
+EPHEMERAL_KEY = ephemeralKey
+
 # Utilities
 RESET_DB = resetDB
 JACK_AUTHORIZER = jackAuthorizer
-
-PACKAGED_TEMPLATE = packaged.yaml
-S3_BUCKET := jack-world-app
-STACK_NAME := JackStack3
-TEMPLATE = template.yaml
 
 .PHONY: test
 test:
@@ -47,7 +61,6 @@ test:
 clean:
 	rm -f $(OUTPUT)/$(GET_BUSINESS_BY_ID_OUTPUT)
 	rm -f $(OUTPUT)/$(CREATE_BUSINESS)
-	rm -f $(OUTPUT)/$(GET_BUSINESS_IN_AREA)
 	rm -f $(OUTPUT)/$(CREATE_PRODUCT)
 	rm -f $(OUTPUT)/$(CREATE_CATEGORY)
 	rm -f $(OUTPUT)/$(GET_BUSINESS_STOCKS)
@@ -64,7 +77,6 @@ install:
 main:
 	go build -o $(OUTPUT)/$(GET_BUSINESS_BY_ID_OUTPUT) ./lambdas/business/$(GET_BUSINESS_BY_ID_OUTPUT).go
 	go build -o $(OUTPUT)/$(CREATE_BUSINESS) ./lambdas/business/$(CREATE_BUSINESS).go
-	go build -o $(OUTPUT)/$(GET_BUSINESS_IN_AREA) ./lambdas/business/$(GET_BUSINESS_IN_AREA).go
 	go build -o $(OUTPUT)/$(LOG_BUSINESS) ./lambdas/business/$(LOG_BUSINESS).go
 	go build -o $(OUTPUT)/$(DELETE_BUSINESS) ./lambdas/business/$(DELETE_BUSINESS).go
 	go build -o $(OUTPUT)/$(UPDATE_BUSINESS) ./lambdas/business/$(UPDATE_BUSINESS).go
@@ -77,6 +89,8 @@ main:
 	go build -o $(OUTPUT)/$(UPDATE_CATEGORY) ./lambdas/stock/$(UPDATE_CATEGORY).go
 	go build -o $(OUTPUT)/$(UPDATE_PRODUCT) ./lambdas/stock/$(UPDATE_PRODUCT).go
 
+	go build -o $(OUTPUT)/$(DELETE_ITEM) ./lambdas/$(DELETE_ITEM).go
+
 	go build -o $(OUTPUT)/$(LOG_USER) ./lambdas/user/$(LOG_USER).go
 	go build -o $(OUTPUT)/$(CREATE_USER) ./lambdas/user/$(CREATE_USER).go
 	go build -o $(OUTPUT)/$(GET_USERS) ./lambdas/user/$(GET_USERS).go
@@ -86,6 +100,7 @@ main:
 	go build -o $(OUTPUT)/$(CREATE_ORDER) ./lambdas/order/$(CREATE_ORDER).go
 	go build -o $(OUTPUT)/$(GET_ORDERS) ./lambdas/order/$(GET_ORDERS).go
 	go build -o $(OUTPUT)/$(UPDATE_ORDER) ./lambdas/order/$(UPDATE_ORDER).go
+	go build -o $(OUTPUT)/$(ORDERS_WATCHER) ./lambdas/order/$(ORDERS_WATCHER).go
 
 	go build -o $(OUTPUT)/$(RESET_DB) ./lambdas/utils/$(RESET_DB).go
 	go build -o $(OUTPUT)/$(JACK_AUTHORIZER) ./lambdas/auth/$(JACK_AUTHORIZER).go

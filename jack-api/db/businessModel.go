@@ -6,12 +6,21 @@ import (
 	"context"
 	"log"
 	"encoding/json"
+	"time"
 )
 
 type LatLng struct {
 	Latitude float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
 }
+
+type DisponibilityStatus int
+
+const (
+	AVAILABLE    DisponibilityStatus = 0
+	UNAVAILABLE   DisponibilityStatus = 1
+	TEMPORARILY_UNAVAILABLE    DisponibilityStatus = 2
+)
 
 type Business struct {
 	//Model
@@ -26,7 +35,11 @@ type Business struct {
 	Description string `json:"description"`
 	Url string `json:"url"`
 
+	DisponibilityStatus DisponibilityStatus `json:"disponibility_status"`
+	DefaultPreparationDuration time.Duration `json:"default_preparation_duration"`
+
 	Token string `json:"token"`
+	FcmToken string `json:"fcm_token"`
 }
 
 type BusinessesResponse struct {
@@ -81,6 +94,9 @@ func (model *Business) Create() bool {
 
 	model.Latitude = pos.Latitude
 	model.Longitude = pos.Longitude
+
+	model.DisponibilityStatus = AVAILABLE
+	model.DefaultPreparationDuration = time.Duration(10 * time.Minute)
 
 	return DB().Create(model).Error == nil
 }

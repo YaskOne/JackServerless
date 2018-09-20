@@ -19,11 +19,16 @@ func LogUser(ctx context.Context, request *events.APIGatewayProxyRequest) (*even
 		return core.MakeHTTPError(400, "Incorrect or empty parameters")
 	}
 
-	db.DB().Where(user).First(&user)
-
-	if user.ID != 0 &&
+	if db.DB().Where(user).First(&user).Error == nil &&
 		request.QueryStringParameters["email"] == user.Email &&
 		request.QueryStringParameters["password"] == user.Password {
+		deviceToken := request.QueryStringParameters["device_token"]
+
+		if len(deviceToken) != 0 {
+			user.DeviceToken = deviceToken
+			db.DB().Save(&user)
+		}
+
 		return core.MakeHTTPResponse(200, db.UserResponse{db.GetUserObject(user)})
 	} else {
 		return core.MakeHTTPError(400, "Wrong credidentials")

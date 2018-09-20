@@ -26,7 +26,7 @@ func (model *Category) Parse(data string) bool {
 
 func (model Category) Exists() bool {
 	if model.ID == 0 {
-		return DB().Where(&Category{Name: model.Name}).First(&model).Error == nil
+		return DB().Where(&Category{Name: model.Name, BusinessID: model.BusinessID}).First(&model).Error == nil
 	}
 	return DB().Where(model.ID).First(&model).Error == nil
 }

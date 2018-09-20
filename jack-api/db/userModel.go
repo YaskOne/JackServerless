@@ -10,10 +10,16 @@ type User struct {
 	ID        uint `json:"id" gorm:"primary_key"`
 
 	Name string `json:"name" gorm:"not null" binding:"required"`
+	Surname string `json:"surname" binding:"required"`
 	Email string `json:"email" gorm:"not null;unique" binding:"required"`
 	Password string `json:"password" gorm:"not null" binding:"required"`
 
+	DeviceToken string `json:"devie_token"`
 	Token string `json:"token"`
+	FcmToken string `json:"fcm_token"`
+
+	StripeKey string `json:"stripe_key"`
+	StripeCustomerId string `json:"stripe_customer_id"`
 }
 
 type UserObject struct {
@@ -21,6 +27,8 @@ type UserObject struct {
 
 	Name string `json:"name" gorm:"not null" binding:"required"`
 	Email string `json:"email" gorm:"not null;unique" binding:"required"`
+
+	StripeCustomerId string `json:"stripe_customer_id"`
 }
 
 type UserResponse struct {
@@ -37,6 +45,7 @@ func GetUserObject(user User) UserObject {
 	userObject.ID = user.ID
 	userObject.Name = user.Name
 	userObject.Email = user.Email
+	userObject.StripeCustomerId = user.StripeCustomerId
 
 	return userObject
 }

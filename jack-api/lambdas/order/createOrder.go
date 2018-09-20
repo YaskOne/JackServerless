@@ -10,6 +10,9 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/kr/pretty"
 	"encoding/json"
+	"JackServerless/jack-api/utils"
+	"github.com/stripe/stripe-go"
+	"fmt"
 )
 
 /*
@@ -19,6 +22,7 @@ import (
 func createOrder(ctx context.Context, request *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	var order db.Order
 	var params db.OrderRequest
+	utils.SendSMS("+33687918380", "Ca roule ? Yoyoyoyoyoyoyo woulouwlou jiwjfbwe niwfe nwf wfji wejfwb hnweijd iwjbfwfjkwenf")
 
 	if err := json.Unmarshal([]byte(request.Body), &params); err != nil {
 		return core.MakeHTTPError(http.StatusNotAcceptable, err.Error())
@@ -30,8 +34,8 @@ func createOrder(ctx context.Context, request *events.APIGatewayProxyRequest) (*
 	order.UserID = params.UserID
 	order.RetrieveDate = retrieveDate
 	order.Canceled = false
-	order.Status = db.OrderStatus("PENDING")
-	order.State = db.OrderState("WAITING")
+	order.OrderStatus = db.PENDING
+	order.State = 0
 
 	pretty.Println(order)
 
@@ -43,6 +47,7 @@ func createOrder(ctx context.Context, request *events.APIGatewayProxyRequest) (*
 	if !(&order).Create() {
 		return core.MakeHTTPError(http.StatusInternalServerError, "Error: creating order")
 	}
+
 
 	products := db.GetProductsById(params.ProductIds)
 
@@ -59,6 +64,43 @@ func createOrder(ctx context.Context, request *events.APIGatewayProxyRequest) (*
 
 	order.Price = price
 	db.DB().Save(&order)
+
+	data := map[string]string{
+		"type": utils.NewOrder,
+		"id": string(order.ID),
+	}
+
+	pretty.Println(order.Business().ID)
+	pretty.Println(order.Business().FcmToken)
+
+	//if business := order.Business(); business.ID != 0 {
+	//	message := fmt.Sprintf("Une nouvelle commande a été passsée pour %", retrieveDate)
+	//	utils.SendPushToClient("Business", business.FcmToken, "Nouvelle commande", message, data)
+	//}
+
+	if business := order.Business(); business.ID != 0 {
+		utils.SendPushToClient("Business", business.FcmToken, "Nouvelle commande", "Une nouvelle commande a été passsée", data)
+	}
+
+	if !core.Develop {
+		charge, err := utils.ChargeCustomer(int(order.Price * 100),
+			stripe.CurrencyEUR,
+			order.User().StripeCustomerId,
+			order.Business().Name + "|" + fmt.Sprint(order.UserID) + "|" + order.RetrieveDate.String())
+
+		transaction := db.Transaction{OrderId: order.ID}
+
+		if err != nil {
+			transaction.Status = db.PAY_FAIDED
+			return core.MakeHTTPError(400, err)
+		}
+
+		transaction.Status = db.PAYED
+		order.ChargeId = charge.ID
+
+		(&transaction).Create()
+		db.DB().Save(&order)
+	}
 
 	return core.MakeHTTPResponse(http.StatusOK, db.IdModel{order.ID})
 }

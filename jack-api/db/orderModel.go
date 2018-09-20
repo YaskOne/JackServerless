@@ -9,22 +9,17 @@ import (
 	DB db binding:"required"
 */
 
-type OrderStatus string
+type OrderStatus uint
 
 const (
-	WAITING    = OrderStatus("PENDING")
-	REJECTED    = OrderStatus("REJECTED")
-	ACCEPTED    = OrderStatus("ACCEPTED")
-)
-
-type OrderState string
-
-const (
-	PENDING    = OrderState("WAITING")
-	PREPARING    = OrderState("PREPARING")
-	READY    = OrderState("READY")
-	DELIVERED    = OrderState("DELIVERED")
-	CANCELED    = OrderState("CANCELED")
+	PENDING    OrderStatus = 0
+	ACCEPTED   OrderStatus = 1
+	PREPARING    OrderStatus = 2
+	READY   OrderStatus = 3
+	DELIVERED   OrderStatus = 4
+	REJECTED    OrderStatus = 5
+	CLIENT_CANCELED   OrderStatus = 6
+	BUSINESS_CANCELED   OrderStatus = 7
 )
 
 type Order struct {
@@ -35,9 +30,11 @@ type Order struct {
 	Price float64 `json:"price"`
 
 	Canceled bool `json:"canceled"`
+	ChargeId string `json:"charge_id"`
+	RefundId string `json:"refund_id"`
 
-	Status OrderStatus `json:"status"`
-	State OrderState `json:"state"`
+	OrderStatus OrderStatus `json:"status"`
+	State int `json:"state"`
 
 	UserID uint `json:"user_id" gorm:"not null"`
 	BusinessID uint `json:"business_id" gorm:"not null"`
@@ -59,6 +56,33 @@ type OrderResponse struct {
 
 type GetOrdersResponse struct {
 	Orders interface{} `json:"orders"`
+}
+
+func (model Order) StartPreparationTime() time.Time {
+	business := model.Business()
+	return model.RetrieveDate.Add(-time.Nanosecond * business.DefaultPreparationDuration)
+}
+
+func (model Order) EndPreparationTime() time.Time {
+	return model.RetrieveDate
+}
+
+func (model Order) DeliveredTime() time.Time {
+	return model.RetrieveDate.Add(time.Minute * 5)
+}
+
+func (model Order) User() User {
+	user := User{}
+
+	DB().Where(model.UserID).First(&user)
+	return user
+}
+
+func (model Order) Business() Business {
+	business := Business{}
+
+	DB().Where(model.BusinessID).First(&business)
+	return business
 }
 
 /*
