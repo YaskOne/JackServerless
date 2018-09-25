@@ -22,13 +22,15 @@ import (
 func createOrder(ctx context.Context, request *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	var order db.Order
 	var params db.OrderRequest
-	utils.SendSMS("+33687918380", "Ca roule ? Yoyoyoyoyoyoyo woulouwlou jiwjfbwe niwfe nwf wfji wejfwb hnweijd iwjbfwfjkwenf")
+	//utils.SendSMS("+33687918380", "Ca roule ? Yoyoyoyoyoyoyo woulouwlou jiwjfbwe niwfe nwf wfji wejfwb hnweijd iwjbfwfjkwenf")
 
 	if err := json.Unmarshal([]byte(request.Body), &params); err != nil {
 		return core.MakeHTTPError(http.StatusNotAcceptable, err.Error())
 	}
 
+	//println(params.RetrieveDate)
 	retrieveDate, _ := time.Parse(time.RFC3339, params.RetrieveDate)
+	//println(retrieveDate.String())
 
 	order.BusinessID = params.BusinessID
 	order.UserID = params.UserID
@@ -37,6 +39,7 @@ func createOrder(ctx context.Context, request *events.APIGatewayProxyRequest) (*
 	order.OrderStatus = db.PENDING
 	order.State = 0
 
+	pretty.Println(retrieveDate)
 	pretty.Println(order)
 
 	// creates place
@@ -73,13 +76,8 @@ func createOrder(ctx context.Context, request *events.APIGatewayProxyRequest) (*
 	pretty.Println(order.Business().ID)
 	pretty.Println(order.Business().FcmToken)
 
-	//if business := order.Business(); business.ID != 0 {
-	//	message := fmt.Sprintf("Une nouvelle commande a été passsée pour %", retrieveDate)
-	//	utils.SendPushToClient("Business", business.FcmToken, "Nouvelle commande", message, data)
-	//}
-
 	if business := order.Business(); business.ID != 0 {
-		utils.SendPushToClient("Business", business.FcmToken, "Nouvelle commande", "Une nouvelle commande a été passsée", data)
+		utils.SendPushToClient("Business", business.FcmToken, "Jack Restaurants", fmt.Sprintf(string(utils.JKOrderPreparing), order.RetrieveDate.Format("15:04")), data)
 	}
 
 	if !core.Develop {

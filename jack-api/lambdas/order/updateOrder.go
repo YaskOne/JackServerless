@@ -11,6 +11,8 @@ import (
 	"JackServerless/jack-api/utils"
 	"github.com/stripe/stripe-go"
 	"github.com/stripe/stripe-go/refund"
+	"time"
+	"fmt"
 )
 
 type UpdateOrderRequest struct {
@@ -36,19 +38,18 @@ func updateOrder(ctx context.Context, request *events.APIGatewayProxyRequest) (*
 		"id": string(order.ID),
 	}
 
+	retrieveDate, err := time.Parse(time.RFC3339, params.RetrieveDate)
+
+	if err == nil {
+		order.RetrieveDate = retrieveDate
+
+		utils.SendPushToClient("Takeway", order.User().FcmToken, "Jack Restaurants", fmt.Sprintf(string(utils.JKOrderAccepted), order.RetrieveDate.Format("15:04")), data)
+		db.DB().Save(&order)
+	}
+
 	if err := updateStatus(params, &order, data); err != "" {
 		core.MakeHTTPError(400, err)
 	}
-
-	//retrieveDate, err := time.Parse(time.RFC3339, params.RetrieveDate)
-	//
-	//if err == nil {
-	//	order.RetrieveDate = retrieveDate
-	//
-	//	message := fmt.Sprintf("Votre commande sera prête pour %", retrieveDate)
-	//	utils.SendPushToClient("Takeway", order.User().FcmToken, "Votre commande", message, data)
-	//	db.DB().Save(&order)
-	//}
 
 	products := []db.OrderProduct{}
 	db.DB().Model(order).Related(&products)
@@ -62,18 +63,20 @@ func updateStatus(params UpdateOrderRequest, order *db.Order, data map[string]st
 		order.OrderStatus = params.OrderStatus
 		db.DB().Save(order)
 		if order.OrderStatus == db.REJECTED {
-			utils.SendPushToClient("Takeway", order.User().FcmToken, "Jack Restaurants", utils.NotificationTexts[utils.JKOrderRejected], data)
+			utils.SendPushToClient("Takeway", order.User().FcmToken, "Jack Restaurants", string(utils.JKOrderRejected), data)
 
 			return refundOrder(order)
+		} else if order.OrderStatus == db.ACCEPTED {
+			utils.SendPushToClient("Takeway", order.User().FcmToken, "Jack Restaurants", fmt.Sprintf(string(utils.JKOrderAccepted), order.RetrieveDate.Format("15:04")), data)
 		} else if order.OrderStatus == db.PREPARING {
-			utils.SendPushToClient("Takeway", order.User().FcmToken, "Jack Restaurants", utils.NotificationTexts[utils.JKOrderPreparing], data)
+			utils.SendPushToClient("Takeway", order.User().FcmToken, "Jack Restaurants", fmt.Sprintf(string(utils.JKOrderPreparing), order.RetrieveDate.Format("15:04")), data)
 		} else if order.OrderStatus == db.READY {
-			utils.SendPushToClient("Takeway", order.User().FcmToken, "Jack Restaurants", utils.NotificationTexts[utils.JKOrderReady], data)
+			utils.SendPushToClient("Takeway", order.User().FcmToken, "Jack Restaurants", string(utils.JKOrderReady), data)
 		} else if order.OrderStatus == db.CLIENT_CANCELED {
-			utils.SendPushToClient("Business", order.Business().FcmToken, "Jack Restaurants", utils.NotificationTexts[utils.JKClientCanceledOrder], data)
+			utils.SendPushToClient("Business", order.Business().FcmToken, "Jack Restaurants", string(utils.JKClientCanceledOrder), data)
 			return refundOrder(order)
 		} else if order.OrderStatus == db.BUSINESS_CANCELED {
-			utils.SendPushToClient("Takeway", order.User().FcmToken, "Jack Restaurants", utils.NotificationTexts[utils.JKBusinessOrderCanceled], data)
+			utils.SendPushToClient("Takeway", order.User().FcmToken, "Jack Restaurants", string(utils.JKBusinessOrderCanceled), data)
 
 			return refundOrder(order)
 		}

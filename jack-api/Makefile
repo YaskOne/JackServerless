@@ -3,7 +3,8 @@ LAMBDA_SUFFIX = .go
 
 PACKAGED_TEMPLATE = packaged.yaml
 S3_BUCKET := jack-world-app
-STACK_NAME := JackStage
+STACK_NAME := JackDev
+
 TEMPLATE = template.yaml
 
 #JackTakewayDev

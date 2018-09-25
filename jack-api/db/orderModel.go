@@ -38,6 +38,9 @@ type Order struct {
 
 	UserID uint `json:"user_id" gorm:"not null"`
 	BusinessID uint `json:"business_id" gorm:"not null"`
+
+	Position uint `json:"position" gorm:"not null"`
+	CellPhone uint `json:"cell_phone" gorm:"not null"`
 }
 
 type OrderRequest struct {
@@ -60,7 +63,7 @@ type GetOrdersResponse struct {
 
 func (model Order) StartPreparationTime() time.Time {
 	business := model.Business()
-	return model.RetrieveDate.Add(-time.Nanosecond * business.DefaultPreparationDuration)
+	return model.RetrieveDate.Add(-business.DefaultPreparationDuration / 1000)
 }
 
 func (model Order) EndPreparationTime() time.Time {

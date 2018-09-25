@@ -26,7 +26,7 @@ Parameters:
 Resources:
   CreateCategory:
     Properties:
-      CodeUri: s3://jack-world-app/82747e58352dca7a513b7710169d446c
+      CodeUri: s3://jack-world-app/56d4ff6b3f289c9923298e4d7bf86cae
       Events:
         GetEvent:
           Properties:
@@ -39,7 +39,7 @@ Resources:
     Type: AWS::Serverless::Function
   CreateOrder:
     Properties:
-      CodeUri: s3://jack-world-app/82747e58352dca7a513b7710169d446c
+      CodeUri: s3://jack-world-app/56d4ff6b3f289c9923298e4d7bf86cae
       Events:
         GetEvent:
           Properties:
@@ -52,7 +52,7 @@ Resources:
     Type: AWS::Serverless::Function
   CreateProduct:
     Properties:
-      CodeUri: s3://jack-world-app/82747e58352dca7a513b7710169d446c
+      CodeUri: s3://jack-world-app/56d4ff6b3f289c9923298e4d7bf86cae
       Events:
         GetEvent:
           Properties:
@@ -65,7 +65,7 @@ Resources:
     Type: AWS::Serverless::Function
   CreateUser:
     Properties:
-      CodeUri: s3://jack-world-app/82747e58352dca7a513b7710169d446c
+      CodeUri: s3://jack-world-app/56d4ff6b3f289c9923298e4d7bf86cae
       Events:
         GetEvent:
           Properties:
@@ -78,7 +78,7 @@ Resources:
     Type: AWS::Serverless::Function
   GetBusinessStocks:
     Properties:
-      CodeUri: s3://jack-world-app/82747e58352dca7a513b7710169d446c
+      CodeUri: s3://jack-world-app/56d4ff6b3f289c9923298e4d7bf86cae
       Events:
         GetEvent:
           Properties:
@@ -91,7 +91,7 @@ Resources:
     Type: AWS::Serverless::Function
   GetUsers:
     Properties:
-      CodeUri: s3://jack-world-app/82747e58352dca7a513b7710169d446c
+      CodeUri: s3://jack-world-app/56d4ff6b3f289c9923298e4d7bf86cae
       Events:
         GetEvent:
           Properties:
@@ -104,13 +104,13 @@ Resources:
     Type: AWS::Serverless::Function
   JackAuthorizer:
     Properties:
-      CodeUri: s3://jack-world-app/82747e58352dca7a513b7710169d446c
+      CodeUri: s3://jack-world-app/56d4ff6b3f289c9923298e4d7bf86cae
       Handler: jackAuthorizer
       Runtime: go1.x
     Type: AWS::Serverless::Function
   LogBusiness:
     Properties:
-      CodeUri: s3://jack-world-app/82747e58352dca7a513b7710169d446c
+      CodeUri: s3://jack-world-app/56d4ff6b3f289c9923298e4d7bf86cae
       Events:
         GetEvent:
           Properties:
@@ -123,7 +123,7 @@ Resources:
     Type: AWS::Serverless::Function
   LogUser:
     Properties:
-      CodeUri: s3://jack-world-app/82747e58352dca7a513b7710169d446c
+      CodeUri: s3://jack-world-app/56d4ff6b3f289c9923298e4d7bf86cae
       Events:
         GetEvent:
           Properties:
@@ -136,7 +136,7 @@ Resources:
     Type: AWS::Serverless::Function
   ResetDB:
     Properties:
-      CodeUri: s3://jack-world-app/82747e58352dca7a513b7710169d446c
+      CodeUri: s3://jack-world-app/56d4ff6b3f289c9923298e4d7bf86cae
       Events:
         GetEvent:
           Properties:
@@ -149,7 +149,7 @@ Resources:
     Type: AWS::Serverless::Function
   createBusiness:
     Properties:
-      CodeUri: s3://jack-world-app/82747e58352dca7a513b7710169d446c
+      CodeUri: s3://jack-world-app/56d4ff6b3f289c9923298e4d7bf86cae
       Events:
         GetEvent:
           Properties:
@@ -162,7 +162,7 @@ Resources:
     Type: AWS::Serverless::Function
   deleteItem:
     Properties:
-      CodeUri: s3://jack-world-app/82747e58352dca7a513b7710169d446c
+      CodeUri: s3://jack-world-app/56d4ff6b3f289c9923298e4d7bf86cae
       Events:
         GetEvent:
           Properties:
@@ -175,7 +175,7 @@ Resources:
     Type: AWS::Serverless::Function
   getBusinessById:
     Properties:
-      CodeUri: s3://jack-world-app/82747e58352dca7a513b7710169d446c
+      CodeUri: s3://jack-world-app/56d4ff6b3f289c9923298e4d7bf86cae
       Events:
         GetEvent:
           Properties:
@@ -188,7 +188,7 @@ Resources:
     Type: AWS::Serverless::Function
   getCategories:
     Properties:
-      CodeUri: s3://jack-world-app/82747e58352dca7a513b7710169d446c
+      CodeUri: s3://jack-world-app/56d4ff6b3f289c9923298e4d7bf86cae
       Events:
         GetEvent:
           Properties:
@@ -201,7 +201,7 @@ Resources:
     Type: AWS::Serverless::Function
   getOrders:
     Properties:
-      CodeUri: s3://jack-world-app/82747e58352dca7a513b7710169d446c
+      CodeUri: s3://jack-world-app/56d4ff6b3f289c9923298e4d7bf86cae
       Events:
         GetEvent:
           Properties:
@@ -214,7 +214,7 @@ Resources:
     Type: AWS::Serverless::Function
   getProducts:
     Properties:
-      CodeUri: s3://jack-world-app/82747e58352dca7a513b7710169d446c
+      CodeUri: s3://jack-world-app/56d4ff6b3f289c9923298e4d7bf86cae
       Events:
         GetEvent:
           Properties:
@@ -227,7 +227,7 @@ Resources:
     Type: AWS::Serverless::Function
   ordersWatcher:
     Properties:
-      CodeUri: s3://jack-world-app/82747e58352dca7a513b7710169d446c
+      CodeUri: s3://jack-world-app/56d4ff6b3f289c9923298e4d7bf86cae
       Events:
         GetEvent:
           Properties:
@@ -240,7 +240,7 @@ Resources:
     Type: AWS::Serverless::Function
   updateBusiness:
     Properties:
-      CodeUri: s3://jack-world-app/82747e58352dca7a513b7710169d446c
+      CodeUri: s3://jack-world-app/56d4ff6b3f289c9923298e4d7bf86cae
       Events:
         GetEvent:
           Properties:
@@ -253,7 +253,7 @@ Resources:
     Type: AWS::Serverless::Function
   updateCategory:
     Properties:
-      CodeUri: s3://jack-world-app/82747e58352dca7a513b7710169d446c
+      CodeUri: s3://jack-world-app/56d4ff6b3f289c9923298e4d7bf86cae
       Events:
         GetEvent:
           Properties:
@@ -266,7 +266,7 @@ Resources:
     Type: AWS::Serverless::Function
   updateOrder:
     Properties:
-      CodeUri: s3://jack-world-app/82747e58352dca7a513b7710169d446c
+      CodeUri: s3://jack-world-app/56d4ff6b3f289c9923298e4d7bf86cae
       Events:
         GetEvent:
           Properties:
@@ -279,7 +279,7 @@ Resources:
     Type: AWS::Serverless::Function
   updateProduct:
     Properties:
-      CodeUri: s3://jack-world-app/82747e58352dca7a513b7710169d446c
+      CodeUri: s3://jack-world-app/56d4ff6b3f289c9923298e4d7bf86cae
       Events:
         GetEvent:
           Properties:
@@ -292,7 +292,7 @@ Resources:
     Type: AWS::Serverless::Function
   updateUser:
     Properties:
-      CodeUri: s3://jack-world-app/82747e58352dca7a513b7710169d446c
+      CodeUri: s3://jack-world-app/56d4ff6b3f289c9923298e4d7bf86cae
       Events:
         GetEvent:
           Properties:

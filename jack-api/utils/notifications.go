@@ -28,6 +28,7 @@ func SendPushToClient(app string, token string, title string, message string, da
 		Notification: fcm.Notification{
 			Title: title,
 			Body:  message,
+			Sound: "default",
 		},
 	})
 	if err != nil {

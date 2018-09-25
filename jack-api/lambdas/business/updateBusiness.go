@@ -10,7 +10,7 @@ import (
 )
 
 func updateBusiness(ctx context.Context, request *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
-	params := db.Business{DisponibilityStatus: -1}
+	params := db.Business{BusinessStatus: -1}
 	business := db.Business{}
 
 	if !(&params).Parse(request.Body) {
@@ -50,8 +50,8 @@ func updateBusiness(ctx context.Context, request *events.APIGatewayProxyRequest)
 	if params.DefaultPreparationDuration != 0 {
 		business.DefaultPreparationDuration = params.DefaultPreparationDuration
 	}
-	if params.DisponibilityStatus != -1 {
-		business.DefaultPreparationDuration = params.DefaultPreparationDuration
+	if params.BusinessStatus != -1 {
+		business.BusinessStatus = params.BusinessStatus
 	}
 
 	db.DB().Save(&business)

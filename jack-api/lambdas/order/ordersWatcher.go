@@ -9,6 +9,7 @@ import (
 	"JackServerless/jack-api/db"
 	"JackServerless/jack-api/utils"
 	"time"
+	"fmt"
 )
 
 func ordersWatcher(ctx context.Context, request *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
@@ -26,9 +27,10 @@ func ordersWatcher(ctx context.Context, request *events.APIGatewayProxyRequest) 
 			"id": string(order.ID),
 		}
 
-		currentTime := time.Now().Add(2 * time.Hour)
+		currentTime := time.Now()
 
 		println(currentTime.String())
+		println(order.Business().DefaultPreparationDuration / 1000000000000 / 60)
 		println(order.StartPreparationTime().String())
 		println(order.EndPreparationTime().String())
 		println(order.DeliveredTime().String())
@@ -39,12 +41,12 @@ func ordersWatcher(ctx context.Context, request *events.APIGatewayProxyRequest) 
 		if currentTime.After(order.StartPreparationTime()) && order.OrderStatus == db.ACCEPTED {
 
 			order.OrderStatus = db.PREPARING
-			utils.SendPushToClient("Takeway", order.User().FcmToken, "Jack Restaurants", utils.NotificationTexts[utils.JKOrderPreparing], data)
+			utils.SendPushToClient("Takeway", order.User().FcmToken, "Jack Restaurants", fmt.Sprintf(string(utils.JKOrderPreparing), order.RetrieveDate.Format("15:04")), data)
 
 		} else if currentTime.After(order.EndPreparationTime()) && order.OrderStatus == db.PREPARING {
 
 			order.OrderStatus = db.READY
-			utils.SendPushToClient("Takeway", order.User().FcmToken, "Jack Restaurants", utils.NotificationTexts[utils.JKOrderReady], data)
+			utils.SendPushToClient("Takeway", order.User().FcmToken, "Jack Restaurants", string(utils.JKOrderReady), data)
 
 		} else if currentTime.After(order.DeliveredTime()) && order.OrderStatus == db.READY {
 

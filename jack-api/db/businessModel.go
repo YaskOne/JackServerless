@@ -14,12 +14,13 @@ type LatLng struct {
 	Longitude float64 `json:"longitude"`
 }
 
-type DisponibilityStatus int
+type BusinessStatus int
 
 const (
-	AVAILABLE    DisponibilityStatus = 0
-	UNAVAILABLE   DisponibilityStatus = 1
-	TEMPORARILY_UNAVAILABLE    DisponibilityStatus = 2
+	BUSINESS_AVAILABLE    BusinessStatus = 0
+	BUSINESS_UNAVAILABLE   BusinessStatus = 1
+	BUSINESS_TEMPORARILY_UNAVAILABLE    BusinessStatus = 2
+	BUSINESS_INDEFINITELY_UNAVAILABLE    BusinessStatus = 3
 )
 
 type Business struct {
@@ -35,7 +36,7 @@ type Business struct {
 	Description string `json:"description"`
 	Url string `json:"url"`
 
-	DisponibilityStatus DisponibilityStatus `json:"disponibility_status"`
+	BusinessStatus BusinessStatus `json:"status"`
 	DefaultPreparationDuration time.Duration `json:"default_preparation_duration"`
 
 	Token string `json:"token"`
@@ -95,7 +96,7 @@ func (model *Business) Create() bool {
 	model.Latitude = pos.Latitude
 	model.Longitude = pos.Longitude
 
-	model.DisponibilityStatus = AVAILABLE
+	model.BusinessStatus = AVAILABLE
 	model.DefaultPreparationDuration = time.Duration(10 * time.Minute)
 
 	return DB().Create(model).Error == nil

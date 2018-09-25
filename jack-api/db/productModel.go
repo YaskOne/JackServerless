@@ -6,15 +6,26 @@ import "encoding/json"
 	DB models
 */
 
+type ProductStatus int
+
+const (
+	PRODUCT_AVAILABLE    ProductStatus = 0
+	PRODUCT_UNAVAILABLE   ProductStatus = 1
+	PRODUCT_TEMPORARILY_UNAVAILABLE    ProductStatus = 2
+)
+
+
 type Product struct {
 	ID        uint `json:"id" gorm:"primary_key"`
 
-	Name string `form:"name" json:"name" gorm:"not null" binding:"required"`
-	Price float64 `form:"price" json:"price" gorm:"not null" binding:"required"`
-	Url string `form:"url" json:"url" gorm:"not null"`
+	Name string `json:"name" gorm:"not null" binding:"required"`
+	Price float64 `json:"price" gorm:"not null" binding:"required"`
+	Url string `json:"url" gorm:"not null"`
 
-	CategoryID uint `form:"category_id" json:"category_id" gorm:"not null" binding:"required"`
-	BusinessID uint `form:"business_id" json:"business_id" gorm:"not null" binding:"required"`
+	CategoryID uint `json:"category_id" gorm:"not null" binding:"required"`
+	BusinessID uint `json:"business_id" gorm:"not null" binding:"required"`
+
+	Status ProductStatus `json:"status"`
 }
 
 type ProductsResponse struct {
